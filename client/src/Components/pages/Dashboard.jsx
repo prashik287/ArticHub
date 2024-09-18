@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-export const Dashboard = () => {
-  const [userdata, setUserdata] = useState(null);
+export const Dashboard = ({ setUserdata }) => {
+  const [userdata, setUserdataLocal] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -12,7 +12,8 @@ export const Dashboard = () => {
       try {
         const response = await axios.get("http://localhost:9000/login/success", { withCredentials: true });
         if (response.data.user) {
-          setUserdata(response.data.user);
+          setUserdataLocal(response.data.user);
+          setUserdata(response.data.user); // Update global userdata
         } else {
           navigate('/login');
         }
@@ -25,7 +26,7 @@ export const Dashboard = () => {
     };
 
     getUser();
-  }, [navigate]);
+  }, [navigate, setUserdata]);
 
   if (loading) {
     return <div>Loading...</div>;

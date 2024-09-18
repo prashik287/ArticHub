@@ -5,17 +5,18 @@ import { FaGoogle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import bgImage from './images/bg-login.jpg';
 
-export const Login = () => {
+export const Login = ({ setUserdata }) => { // Destructure setUserdata from props
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     acctype: 'buyer',
   });
-  
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
@@ -24,11 +25,12 @@ export const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const response = await axios.post('http://localhost:9000/login', formData, { withCredentials: true });
       if (response.status === 200 && response.data.user) {
         alert("Login Successful");
+        setUserdata(response.data.user); // Update userdata here
         navigate('/dashboard');
       } else {
         console.error('Login failed:', response.data.message || 'Unknown error');
@@ -37,7 +39,6 @@ export const Login = () => {
       console.error('An error occurred during login:', error);
     }
   };
-
 
   const loginWithGoogle = (e) => {
     e.preventDefault();
@@ -66,7 +67,7 @@ export const Login = () => {
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-300 via-orange-300 to-red-300 opacity-30 pointer-events-none"></div>
           </div>
         ))}
-        
+
         <div className="relative mb-4">
           <select
             name="acctype"

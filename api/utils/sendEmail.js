@@ -8,8 +8,8 @@ module.exports = async (email, subject, text) => {
             service: 'gmail',
             secure: false, // For development, set to true in production if using SSL
             auth: {
-              user:"jprashik42@gmail.com",
-              pass:"eylxrzhtcitrtisq"
+              user:process.env.SENDER,
+              pass:process.env.SENDER_PASS
               // Ensure this is correct
             },
             tls: {

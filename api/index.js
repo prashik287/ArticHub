@@ -15,7 +15,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const mongoose = require('./db/conn'); // Ensure connection happens before initializing
 const route = require('./routes/users');
 
-const PORT = 9000;
+const PORT = 9000 || 8000;
 
 // CORS setup - This must be before any routes are defined
 app.use(cors({

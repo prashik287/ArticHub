@@ -6,11 +6,11 @@ import axios from 'axios';
 import { HiMenu } from "react-icons/hi";
 import { IoIosClose } from "react-icons/io";
 import { Link, useNavigate } from 'react-router-dom';
+import defaultacc from '../pages/images/default-acc.png'
 
-const Navbar = ({ selectedCurrency, setSelectedCurrency }) => {
-  const [userdata, setUserdata] = useState(null); // Changed to null for better null checks
+const Navbar = ({ selectedCurrency, setSelectedCurrency, userdata: userData, setUserdata }) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false); // Renamed for consistency
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const currencies = [
@@ -24,14 +24,19 @@ const Navbar = ({ selectedCurrency, setSelectedCurrency }) => {
 
   useEffect(() => {
     getUser();
-  }, []);
+  }, []); // Fetch user data once on mount
 
   const getUser = async () => {
     try {
       const response = await axios.get("http://localhost:9000/login/success", { withCredentials: true });
-      setUserdata(response.data.user);
+      if (response.data.user) {
+        setUserdata(response.data.user); // Update userdata directly
+      } else {
+        setUserdata(null); // Clear userdata if no user found
+      }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      setUserdata(null); // Clear userdata on error
     }
   };
 
@@ -124,18 +129,18 @@ const Navbar = ({ selectedCurrency, setSelectedCurrency }) => {
             </button>
           </div>
           {
-            userdata ? ( // Check if userdata is not null
+            userData ? ( // Check if userData is not null
               <div className='relative'>
                 <button
                   className='flex items-center px-6 py-2 space-x-2 text-white bg-pink-500 rounded-full transition-colors hover:bg-pink-600'
                   onClick={handleDropdownToggle}
                 >
                   <img 
-                    src={userdata?.image || '/default-avatar.png'} 
+                    src={userData?.image || defaultacc} 
                     alt="User Avatar" 
                     className="object-cover w-8 h-8 rounded-full"
                   />
-                  <span>{userdata?.email}</span>
+                  <span>{userData?.email}</span>
                 </button>
                 {showDropdown && (
                   <div className='absolute right-0 py-2 mt-2 w-48 bg-white rounded-md shadow-lg'>
@@ -209,7 +214,7 @@ const Navbar = ({ selectedCurrency, setSelectedCurrency }) => {
                 <li>
                   <Link to="/cart" className='text-xl text-gray-800 hover:text-gray-600'>Cart</Link>
                 </li>
-                {userdata ? (
+                {userData ? (
                   <>
                     <li>
                       <Link to="/profile" className='text-xl text-gray-800 hover:text-gray-600'>Profile</Link>
