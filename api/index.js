@@ -39,6 +39,7 @@ mongoDBstore.on('error', (error) => {
 });
 
 // Setup session middleware
+// Setup session middleware
 app.use(session({
     name: "session_id",
     secret: process.env.SESSION_SECRET || "defaultsecret",
@@ -47,10 +48,13 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         maxAge: 1000 * 60 * 60 * 3, // 3 hours
-        sameSite: 'lax',
-        secure: false // Set to true in production if using HTTPS
+        sameSite: "None", // Properly set SameSite
+        secure: false, // Set to true in production
+        // If you want to experiment with Partitioned cookies, you can add this attribute:
+        // partitioned: true, // Uncomment if needed, but be aware of compatibility
     }
 }));
+
 
 // Initialize Passport and use session
 app.use(passport.initialize());
@@ -120,7 +124,7 @@ passport.deserializeUser(async (id, done) => {
         done(error);
     }
 });
-// Routes
+// Login route
 app.post('/login', async (req, res) => {
     try {
         const { email, password, acctype } = req.body;
@@ -139,6 +143,11 @@ app.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (isMatch) {
+            // Check if the user is verified
+            if (user.verified === false) {
+                return res.status(401).json({ message: 'User is not verified' });
+            }
+
             req.session.isLoggedIn = true;
             req.session.user = {
                 _id: user._id,
@@ -147,19 +156,24 @@ app.post('/login', async (req, res) => {
             };
             await req.session.save();
 
-            res.status(200).json({ message: "Login Success", user: {
-                _id: user._id,
-                email: user.email,
-                acctype: acctype
-            }});
-        } else {
-            res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(200).json({
+                message: "Login Success",
+                user: {
+                    _id: user._id,
+                    email: user.email,
+                    acctype: acctype
+                }
+            });
+        } 
+        else {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Error logging in' });
+        return res.status(500).json({ message: 'Error logging in' });
     }
 });
+
 
 app.get('/login/success', (req, res) => {
     const isLoggedin = req.session.isLoggedIn

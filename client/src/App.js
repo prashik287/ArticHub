@@ -10,12 +10,14 @@ import NotFound from './Components/pages/NotFound';
 import CompleteSignup from './Components/pages/CompleteSignup';
 import VerificationFailed from './Components/pages/VerificationFailed';
 import Verificationsuccess from './Components/pages/Verificationsuccess';
-
+import Footer from './Components/footer/Footer'
+import { Theme } from '@radix-ui/themes';
 function App() {
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
   const [userdata, setUserdata] = useState(null);
 
   return (
+    <Theme appearance='dark'>
     <Router>
 <Navbar 
   selectedCurrency={selectedCurrency} 
@@ -34,7 +36,9 @@ function App() {
         <Route path='/verification-failed' element={<VerificationFailed />} />
         <Route path='/verification-success' element={<Verificationsuccess />} />
       </Routes>
+      <Footer/>
     </Router>
+    </Theme>
   );
 }
 
